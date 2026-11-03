@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>檸檬知識｜企業洞察工作台 Demo</title>
+  <meta name="description" content="以 Notion 原生頁面、分頁、資料庫與按鈕為基礎的企業洞察工具示範">
+  <style>
+    :root{--text:#37352f;--muted:#666762;--line:#e9e9e7;--soft:#f7f7f5;--blue:#2e6cbb;--focus:#2e6cbb;--yellow:#fbf4db;--green:#edf5ed;--purple:#f3eff8;--red:#f9eded}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#fff;color:var(--text);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+    button:disabled{cursor:not-allowed;opacity:.48}
+    .topbar{height:44px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;color:#777872;font-size:12px}
+    .topbar strong{color:var(--text);font-weight:600}.demo-badge{background:#f1f1ef;padding:3px 8px;border-radius:4px;color:#63645f}
+    .page{max-width:950px;margin:0 auto;padding:48px 32px 80px}
+    .page-icon{font-size:54px;line-height:1;margin-bottom:19px}
+    h1{font-size:38px;letter-spacing:-.035em;line-height:1.25;margin:0 0 10px}
+    .lede{color:var(--muted);margin:0 0 22px}
+    h2{font-size:24px;line-height:1.35;letter-spacing:-.025em;margin:0 0 8px}
+    h3{font-size:17px;margin:26px 0 10px}
+    p{margin:0 0 12px}.small{font-size:13px;color:var(--muted)}.eyebrow{font-size:12px;color:#676864;margin:0 0 7px}
+    .callout{padding:15px 18px;border-radius:5px;background:var(--soft);display:flex;gap:12px;align-items:flex-start;margin:18px 0;line-height:1.6}
+    .callout.yellow{background:var(--yellow)}.callout.green{background:var(--green)}.callout.purple{background:var(--purple)}.callout.red{background:var(--red)}
+    .callout .emoji{font-size:19px;line-height:1.4;flex:none}.callout p:last-child{margin-bottom:0}
+    .callout strong{font-weight:700}.tab-hint{display:none;color:var(--muted);font-size:12px;margin:5px 0}
+    .tabs{display:flex;gap:3px;overflow-x:auto;border:1px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;padding:8px 8px 0;scrollbar-width:thin}
+    .tabs button{border:0;border-bottom:2px solid transparent;border-radius:5px 5px 0 0;background:transparent;color:#686864;white-space:nowrap;padding:9px 12px 10px;font-size:14px;font-weight:600}
+    .tabs button:hover{background:var(--soft)}.tabs button[aria-selected=true]{background:var(--soft);border-bottom-color:var(--text);color:var(--text)}
+    .surface{border:1px solid var(--line);border-radius:0 0 8px 8px;padding:30px 30px 42px;min-height:390px}
+    [role=tabpanel][hidden]{display:none}.section-lede{color:var(--muted);max-width:680px}
+    .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:28px 0 10px;flex-wrap:wrap}
+    .toolbar h3{margin:0}.button{border:1px solid #dededb;background:#fff;border-radius:5px;padding:8px 12px;font-size:14px;color:var(--text)}
+    .button:hover{background:var(--soft)}.button.primary{background:var(--blue);border-color:var(--blue);color:#fff}.button.primary:hover{background:#245995}
+    .button.minor{border:0;color:var(--blue);padding-left:0;background:transparent}.button.minor:hover{text-decoration:underline}
+    .button.mini{font-size:12px;padding:4px 7px}
+    .table-wrap{border:1px solid var(--line);overflow-x:auto}.db{border-collapse:collapse;width:100%;min-width:570px;text-align:left}
+    .db th,.db td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:9px 11px;vertical-align:middle;font-size:13px}
+    .db th:last-child,.db td:last-child{border-right:0}.db tr:last-child td{border-bottom:0}.db th{color:#71726e;font-weight:500;background:#fbfbfa}
+    .db td .name{font-weight:600}.db .empty{color:#92938d;text-align:center;padding:24px}
+    .db select,.db input{width:100%;border:1px solid #e1e1de;border-radius:4px;padding:5px 7px;background:#fff;font-size:13px;color:var(--text)}
+    .status{display:inline-block;background:#efefed;border-radius:4px;color:#666762;font-size:12px;padding:3px 7px}
+    .status.ready{background:#e8f3ea;color:#356b42}.status.pending{background:#fff1d7;color:#8a6420}
+    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:20px 0 6px}
+    .source-list{padding-left:21px;margin:10px 0}.source-list li{margin:5px 0}
+    .step-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+    .step{border:1px solid var(--line);border-radius:5px;padding:17px}.step strong{display:block}.step p{font-size:13px;color:var(--muted);margin:4px 0 0}.step.done{border-color:#b7d8ba;background:#f5faf5}
+    .sample-link{border-top:1px solid var(--line);margin-top:26px;padding-top:17px}
+    .report-meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:9px 0 18px;border-bottom:1px solid var(--line)}
+    .report-body{max-width:730px}.report-body h3{margin-top:28px}.report-body li{margin-bottom:8px}
+    .report-body .comparison{margin:15px 0}
+    .back{border:0;background:none;color:var(--muted);padding:9px 8px;min-height:44px;margin:0 0 13px -8px;font-size:14px}
+    .back:hover{text-decoration:underline}
+    .stack{display:grid;gap:12px;margin:22px 0}.application{border:1px solid var(--line);border-radius:5px;padding:17px 18px}
+    .application h3{margin:0 0 4px}.application p{color:var(--muted);font-size:13px}.application .actions{margin-bottom:0}
+    .pill{display:inline-block;background:#f1f1ef;color:#61625d;border-radius:4px;padding:2px 6px;font-size:12px;margin:2px 5px 2px 0}
+    .notice{font-size:13px;color:var(--muted);border-left:3px solid #b9b9b4;padding-left:11px;margin:17px 0}
+    details.admin{margin-top:26px;border-top:1px solid var(--line);padding:17px 2px;font-size:13px;color:var(--muted)}
+    details.admin summary{cursor:pointer;font-weight:600;color:#6d6e69}details.admin li{margin:5px 0}
+    .toast{position:fixed;bottom:20px;right:20px;max-width:340px;background:#37352f;color:#fff;border-radius:5px;padding:11px 15px;font-size:13px;box-shadow:0 8px 26px #0002;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:650px){
+      .topbar{padding:0 15px}.page{padding:24px 14px 55px}.page-icon{font-size:42px;margin-bottom:12px}h1{font-size:29px}.lede{font-size:13px;margin-bottom:12px}
+      .callout{margin:12px 0;padding:12px 13px;font-size:13px}.tab-hint{display:block}
+      .tabs{margin-top:7px}.tabs button{font-size:13px;padding:8px 10px}.surface{padding:22px 16px 30px}
+      h2{font-size:21px}.step-list{grid-template-columns:1fr}.toolbar{align-items:flex-start}.toolbar h3{font-size:16px}
+      .button{min-height:40px}.button.mini{min-height:34px}.report-meta{display:block}.report-meta span{display:block;margin:4px 0}
+      .file-db,.competitor-db{min-width:0}.file-db thead,.competitor-db thead{display:none}
+      .file-db tbody,.competitor-db tbody{display:grid;gap:12px;background:#fff}
+      .file-db tr,.competitor-db tr{display:grid;border:1px solid var(--line);border-radius:5px;padding:8px 11px}
+      .file-db td,.competitor-db td{display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-bottom:1px solid var(--line);padding:8px 0;min-width:0;overflow-wrap:anywhere}
+      .file-db td:last-child,.competitor-db td:last-child{border-bottom:0}
+      .file-db td:before,.competitor-db td:before{content:attr(data-label);color:#696a65;font-size:12px;flex:none}
+      .file-db td:first-child,.competitor-db td:first-child{font-weight:600}
+      .file-db td select,.competitor-db td input{width:min(56%,220px);min-height:38px}
+      .file-db td .button,.competitor-db td .button{min-height:38px}
+      .file-db td.empty,.competitor-db td.empty{display:block;text-align:left}
+      .file-db td.empty:before,.competitor-db td.empty:before{content:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><span>檸檬知識 <span aria-hidden="true">／</span> <strong>企業洞察工作台</strong></span><span class="demo-badge">HTML 示範</span></header>
+  <main class="page">
+    <div class="page-icon" aria-hidden="true">🍋</div>
+    <h1>企業主入口｜洞察工作台</h1>
+    <p class="lede">從資料上傳開始，逐步閱讀客戶、競品、公司營運與應用報告。</p>
+    <div class="callout yellow"><span class="emoji" aria-hidden="true">👋</span><div><strong>第一次使用，先到「上傳資料」。</strong><p>這份 HTML 只示範操作流程。選取的檔案不會送出，也不會被 AI 分析；範例報告與你的資料分開顯示。</p></div></div>
+    <p class="tab-hint">分頁可左右滑動查看全部內容 →</p>
+    <nav class="tabs" role="tablist" aria-label="工作台分頁">
+      <button id="tab-data" role="tab" aria-selected="true" aria-controls="data" tabindex="0" data-tab="data">📥 上傳資料</button>
+      <button id="tab-customer" role="tab" aria-selected="false" aria-controls="customer" tabindex="-1" data-tab="customer">👥 客戶報告</button>
+      <button id="tab-competitor" role="tab" aria-selected="false" aria-controls="competitor" tabindex="-1" data-tab="competitor">🔎 競品報告</button>
+      <button id="tab-internal" role="tab" aria-selected="false" aria-controls="internal" tabindex="-1" data-tab="internal">📊 營運報告</button>
+      <button id="tab-applications" role="tab" aria-selected="false" aria-controls="applications" tabindex="-1" data-tab="applications">🧭 應用報告</button>
+    </nav>
+    <div class="surface">
+      <section id="data" role="tabpanel" aria-labelledby="tab-data">
+        <p class="eyebrow">第一步 · 資料收件匣</p><h2>把手邊的資料放進來</h2>
+        <p class="section-lede">選擇會議紀錄、訪談或公司文件。這裡用 Notion 資料庫的「名稱、檔案、資料類型、處理狀態」欄位呈現。</p>
+        <div class="toolbar"><h3>資料收件匣 <span class="small" id="fileCount">0 筆</span></h3><button class="button primary" id="addFile">＋ 新增資料</button></div>
+        <div class="table-wrap"><table class="db file-db"><thead><tr><th scope="col">名稱</th><th scope="col">檔案</th><th scope="col">資料類型</th><th scope="col">處理狀態</th><th scope="col">操作</th></tr></thead><tbody id="fileRows"></tbody></table></div>
+        <div class="callout yellow"><span class="emoji" aria-hidden="true">ℹ️</span><div><strong>Demo 的資料只留在這次開啟的畫面。</strong><p>重新整理後會清空；檔案內容不會被讀取。正式 Notion 版會把資料存入資料庫並記錄使用範圍。</p></div></div>
+      </section>
+      <section id="customer" role="tabpanel" aria-labelledby="tab-customer" hidden>
+        <p class="eyebrow">基礎報告 01</p><h2>客戶同理心地圖</h2><p class="section-lede">用訪談與客戶回饋，看懂客戶說了什麼、做了什麼、在意什麼。</p>
+        <div class="callout green" id="customerCallout"></div>
+        <div class="actions"><button class="button primary" id="customerAction"></button><button class="button minor" data-sample="customer">先看範例報告 →</button></div>
+        <p class="notice">正式版的「產出報告」需接上 Notion 按鈕與 AI 流程。此 Demo 只建立報告頁骨架，不會推論你的檔案內容。</p>
+        <div class="toolbar"><h3>客戶報告資料庫</h3></div>
+        <div class="table-wrap"><table class="db"><thead><tr><th scope="col">報告名稱</th><th scope="col">資料範圍</th><th scope="col">狀態</th></tr></thead><tbody id="customerRows"></tbody></table></div>
+      </section>
+      <section id="competitor" role="tabpanel" aria-labelledby="tab-competitor" hidden>
+        <p class="eyebrow">基礎報告 02</p><h2>競品分析報告</h2><p class="section-lede">先列出想了解的競品，再逐家蒐集與分析；完成後才產出綜合報告。</p>
+        <div class="step-list"><div class="step" id="stepOne"><strong>① 個別競品分析</strong><p>確認競品名單，建立每一家的資料頁。</p></div><div class="step" id="stepTwo"><strong>② 綜合競品報告</strong><p>用相同欄位比較多家競品，保留來源與日期。</p></div></div>
+        <div class="toolbar"><h3>競品名單 <span class="small" id="competitorCount">0 家</span></h3><button class="button" id="addCompetitor">＋ 新增競品</button></div>
+        <div class="table-wrap"><table class="db competitor-db"><thead><tr><th scope="col">競品名稱</th><th scope="col">個別分析</th><th scope="col">操作</th></tr></thead><tbody id="competitorRows"></tbody></table></div>
+        <div class="callout purple" id="competitorCallout"></div>
+        <div class="actions"><button class="button primary" id="competitorAction"></button><button class="button minor" id="oldCompetitorReport" hidden>閱讀上一版 →</button><button class="button minor" data-sample="competitor">先看範例報告 →</button></div>
+        <p class="notice">Demo 不會搜尋公開網頁。正式版的個別分析與綜合報告需由 Notion 按鈕啟動已設定的流程。</p>
+      </section>
+      <section id="internal" role="tabpanel" aria-labelledby="tab-internal" hidden>
+        <p class="eyebrow">基礎報告 03</p><h2>內部營運報告</h2><p class="section-lede">從會議紀錄與公司文件，整理現況、已採取的做法和仍缺少的資訊。</p>
+        <div class="callout green" id="internalCallout"></div>
+        <div class="actions"><button class="button primary" id="internalAction"></button><button class="button minor" data-sample="internal">先看範例報告 →</button></div>
+        <p class="notice">Demo 不會閱讀檔案內容；按鈕只建立可檢視來源的報告頁骨架。</p>
+        <div class="toolbar"><h3>營運報告資料庫</h3></div>
+        <div class="table-wrap"><table class="db"><thead><tr><th scope="col">報告名稱</th><th scope="col">資料範圍</th><th scope="col">狀態</th></tr></thead><tbody id="internalRows"></tbody></table></div>
+      </section>
+      <section id="applications" role="tabpanel" aria-labelledby="tab-applications" hidden>
+        <p class="eyebrow">延伸閱讀</p><h2>應用報告</h2><p class="section-lede">從一份或多份基礎報告出發，閱讀網站營運、內容經營等具體主題。</p>
+        <div class="callout yellow"><span class="emoji" aria-hidden="true">🧭</span><div><strong>先有基礎報告，再延伸應用。</strong><p>此 Demo 可用基礎報告頁骨架建立應用報告頁骨架；正式版須等分析完成。範例報告可隨時閱讀。</p></div></div>
+        <div class="stack" id="applicationList"></div>
+        <div class="toolbar"><h3>我的應用報告</h3></div>
+        <div class="table-wrap"><table class="db"><thead><tr><th scope="col">報告名稱</th><th scope="col">引用的報告</th><th scope="col">狀態</th></tr></thead><tbody id="applicationRows"></tbody></table></div>
+      </section>
+      <section id="report" role="tabpanel" aria-label="報告頁" hidden>
+        <button class="back" id="reportBack">← 返回</button>
+        <div class="report-body"><p class="eyebrow" id="reportKicker"></p><h2 id="reportTitle"></h2><div class="report-meta" id="reportMeta"></div><div id="reportContent"></div></div>
+      </section>
+    </div>
+    <details class="admin"><summary>管理者設定與檢核</summary>
+      <p>企業主不需要操作這一區。正式 Notion 版可用資料庫、範本頁、按鈕、狀態欄位與管理者檢核頁組成。</p>
+      <ul><li>資料收件匣：檔案、類型、資料日期、使用範圍、處理狀態。</li><li>競品資料庫：逐家分析、來源網址、查詢日期與資料不足標記。</li><li>報告資料庫：報告類型、引用來源、版本、建立日期與狀態。</li><li>每份報告保留上一版；若資料不足，清楚顯示待補項目。</li></ul>
+    </details>
+  </main>
+  <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.md,.csv,.xlsx,.mp3,.m4a,.wav" multiple hidden>
+  <div class="toast" role="status" aria-live="polite" id="toast"></div>
+  <script>
+    const $=selector=>document.querySelector(selector);
+    const state={files:[],competitors:[],reports:{customer:[],competitor:[],internal:[],applications:[]},competitorPhase:'list',activeTab:'data',reportOrigin:'data',reportView:null};
+    const labels={customer:'客戶同理心地圖',competitor:'競品分析報告',internal:'內部營運報告'};
+    const appDefs=[
+      {id:'website',title:'網站營運分析',needs:['customer','websiteFile'],description:'結合客戶報告與網站資料，檢視網站內容和導覽。'},
+      {id:'content',title:'網站內容經營方向',needs:['customer','competitor'],description:'對照客戶關心的問題與競品公開內容。'},
+      {id:'service',title:'服務體驗改善',needs:['customer','internal'],description:'比較客戶感受與公司目前的服務做法。'}
+    ];
+    const sample={
+      customer:{company:'範例公司：理髮品牌 A',summary:'受訪者在預約前最想確認價格、服務時間與髮型效果。三組模擬訪談中，有兩組主動提到價格資訊不清楚。',findings:['預約前需要明確價格與時間，這比髮型照片更早被問起。','曾經說過的偏好若沒有被記錄，客戶會在下次服務時重複解釋。','想要改變髮型的人，常擔心實際效果與照片不符。'],sources:['模擬訪談 01—03；僅作版面展示']},
+      competitor:{company:'範例公司：理髮品牌 A',summary:'三家示範競品的公開資訊呈現方式不同；範例資料都尚未確認現行服務價格。',findings:['Lazy：髮型作品多，但範例資料未確認現行價格。','Max：主打美式燙髮與商業造型，範例資料有預約入口。','Norman：將髮片服務與剪燙染分開介紹。'],sources:['示範競品資料；非即時網路調查']},
+      internal:{company:'範例公司：理髮品牌 A',summary:'三份示範會議紀錄反覆提到預約資訊不一致；尚無資料可證明改善措施是否已降低客戶疑問。',findings:['兩次會議提到服務說明與現場回答不同。','團隊已討論統一常見問題，但沒有記錄實際上線日期。','需要補上預約前提問數量，才能判斷改善效果。'],sources:['示範會議紀錄 01—03；僅作版面展示']}
+    };
+    function escapeHtml(value){return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+    function showToast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.classList.remove('show'),4200)}
+    function selectTab(id,focus=false){state.activeTab=id;document.querySelectorAll('.tabs button').forEach(button=>{const selected=button.dataset.tab===(id==='report'?state.reportOrigin:id);button.setAttribute('aria-selected',String(selected));button.tabIndex=selected?0:-1;if(selected&&focus)button.focus()});document.querySelectorAll('[role=tabpanel]').forEach(panel=>panel.hidden=panel.id!==id);if(id!=='report')state.reportOrigin=id;window.scrollTo({top:0,behavior:'smooth'})}
+    document.querySelectorAll('.tabs button').forEach(button=>button.addEventListener('click',()=>selectTab(button.dataset.tab)));
+    $('.tabs').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=[...document.querySelectorAll('.tabs button')];const current=tabs.findIndex(tab=>tab.getAttribute('aria-selected')==='true');const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;selectTab(tabs[next].dataset.tab,true);tabs[next].scrollIntoView({block:'nearest',inline:'nearest'})});
+    const allowed=/\.(pdf|doc|docx|txt|md|csv|xlsx|mp3|m4a|wav)$/i;
+    function guessType(name){if(/客戶|訪談|回饋|customer|interview/i.test(name))return'客戶與訪談';if(/競品|市場|competitor|market/i.test(name))return'競品與市場';if(/網站|流量|ga4|web|site|analytics/i.test(name))return'網站資料';if(/會議|營運|財務|銷售|meeting|operation/i.test(name))return'內部營運';return'待分類'}
+    function addFiles(files){const accepted=[],rejected=[];for(const file of files){if(!allowed.test(file.name)){rejected.push(file.name);continue}accepted.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),name:file.name,type:guessType(file.name),size:file.size})}state.files.push(...accepted);render();if(rejected.length)showToast('未加入不支援的格式：'+rejected.map(x=>x.slice(0,24)).join('、'));else if(accepted.length)showToast('已加入 '+accepted.length+' 份檔案；此 Demo 不會上傳或分析內容。')}
+    $('#addFile').addEventListener('click',()=>$('#fileInput').click());
+    $('#fileInput').addEventListener('change',event=>{addFiles(event.target.files);event.target.value=''});
+    $('#fileRows').addEventListener('change',event=>{if(!event.target.matches('select[data-file]'))return;const row=state.files.find(file=>file.id===event.target.dataset.file);if(row){row.type=event.target.value;renderCore('customer');renderCore('internal');renderApplications();showToast('已更新資料類型')}});
+    $('#fileRows').addEventListener('click',event=>{const button=event.target.closest('[data-remove-file]');if(!button)return;state.files=state.files.filter(file=>file.id!==button.dataset.removeFile);render();showToast('已從 Demo 清單移除')});
+    function addCompetitor(){state.competitors.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),name:''});render();const inputs=[...document.querySelectorAll('#competitorRows input[data-competitor]')];inputs.at(-1)?.focus()}
+    $('#addCompetitor').addEventListener('click',addCompetitor);
+    $('#competitorRows').addEventListener('input',event=>{if(!event.target.matches('input[data-competitor]'))return;const item=state.competitors.find(row=>row.id===event.target.dataset.competitor);if(item)item.name=event.target.value});
+    $('#competitorRows').addEventListener('change',()=>{$('#competitorCount').textContent=validCompetitors().length+' 家'});
+    $('#competitorRows').addEventListener('click',event=>{const button=event.target.closest('[data-remove-competitor]');if(!button)return;state.competitors=state.competitors.filter(row=>row.id!==button.dataset.removeCompetitor);render()});
+    function filesFor(kind){return state.files.filter(file=>kind==='customer'?file.type==='客戶與訪談':file.type==='內部營運')}
+    function latest(kind){return state.reports[kind].at(-1)}
+    function createOutline(kind){const sources=filesFor(kind);if(!sources.length){selectTab('data');showToast('請先加入並分類相關資料');return}const report={id:String(Date.now()+Math.random()),kind,title:labels[kind],sources:sources.map(file=>file.name),created:new Date().toLocaleDateString('zh-TW'),status:'待 AI 分析'};state.reports[kind].push(report);render();openReport(kind,'outline',report)}
+    $('#customerAction').addEventListener('click',()=>createOutline('customer'));
+    $('#internalAction').addEventListener('click',()=>createOutline('internal'));
+    function validCompetitors(){return state.competitors.map(row=>row.name.trim()).filter(Boolean)}
+    $('#competitorAction').addEventListener('click',()=>{const names=validCompetitors();if(!names.length){if(!state.competitors.length)addCompetitor();showToast('請先輸入至少一家競品名稱');return}if(state.competitorPhase==='list'||state.competitorPhase==='ready'){state.competitorPhase='profiles';render();showToast('已建立 '+names.length+' 家競品的分析頁骨架；尚未搜尋公開資料。');return}const report={id:String(Date.now()+Math.random()),kind:'competitor',title:'綜合競品分析報告',sources:names,created:new Date().toLocaleDateString('zh-TW'),status:'待 AI 分析'};state.reports.competitor.push(report);state.competitorPhase='ready';render();openReport('competitor','outline',report)});
+    $('#oldCompetitorReport').addEventListener('click',()=>{const report=latest('competitor');if(report)openReport('competitor','outline',report)});
+    function renderFiles(){const body=$('#fileRows');$('#fileCount').textContent=state.files.length+' 筆';body.innerHTML=state.files.length?state.files.map(file=>`<tr><td class="name" data-label="名稱">${escapeHtml(file.name)}</td><td data-label="檔案">📎 ${escapeHtml(file.name)}</td><td data-label="資料類型"><select data-file="${file.id}" aria-label="設定 ${escapeHtml(file.name)} 的資料類型">${['待分類','客戶與訪談','競品與市場','內部營運','網站資料'].map(type=>`<option ${type===file.type?'selected':''}>${type}</option>`).join('')}</select></td><td data-label="處理狀態"><span class="status pending">待整理</span></td><td data-label="操作"><button class="button mini" data-remove-file="${file.id}" aria-label="移除 ${escapeHtml(file.name)}">移除</button></td></tr>`).join(''):'<tr><td class="empty" colspan="5">目前沒有資料。按「新增資料」開始。</td></tr>'}
+    function renderCore(kind){const sources=filesFor(kind);const title=kind==='customer'?'客戶資料':'內部營運資料';$('#'+kind+'Callout').innerHTML=`<span class="emoji" aria-hidden="true">${kind==='customer'?'👥':'📊'}</span><div><strong>${sources.length?`已選取 ${sources.length} 份${title}`:`尚未加入${title}`}</strong><p>${sources.length?'可建立報告頁骨架；Demo 不會分析檔案內容。':'請先到「上傳資料」新增資料，並確認資料類型。'}</p></div>`;const action=$('#'+kind+'Action');action.textContent=sources.length?'建立報告頁骨架 →':'先上傳資料 →';const rows=$('#'+kind+'Rows');rows.innerHTML=state.reports[kind].length?state.reports[kind].map(report=>`<tr><td><button class="button minor" data-open-outline="${report.id}">${escapeHtml(report.title)} · ${report.created}</button></td><td>${report.sources.length} 份檔案</td><td><span class="status pending">待 AI 分析</span></td></tr>`).join(''):'<tr><td class="empty" colspan="3">尚未建立公司報告；可先閱讀範例。</td></tr>'}
+    function renderCompetitors(){const rows=$('#competitorRows');$('#competitorCount').textContent=validCompetitors().length+' 家';rows.innerHTML=state.competitors.length?state.competitors.map(row=>`<tr><td data-label="競品名稱"><input data-competitor="${row.id}" value="${escapeHtml(row.name)}" aria-label="競品名稱" placeholder="輸入競品名稱"></td><td data-label="個別分析"><span class="status ${state.competitorPhase==='list'?'':'pending'}">${state.competitorPhase==='list'?'尚未建立':'待蒐集資料'}</span></td><td data-label="操作"><button class="button mini" data-remove-competitor="${row.id}">移除</button></td></tr>`).join(''):'<tr><td class="empty" colspan="3">還沒有競品。按「新增競品」填入名稱。</td></tr>';$('#stepOne').classList.toggle('done',state.competitorPhase!=='list');$('#stepTwo').classList.toggle('done',state.competitorPhase==='ready');const action=$('#competitorAction');action.textContent=state.competitorPhase==='profiles'?'建立綜合報告頁骨架 →':state.competitorPhase==='ready'?'更新個別競品資料 →':'建立個別競品分析頁 →';$('#oldCompetitorReport').hidden=!latest('competitor');$('#oldCompetitorReport').textContent=state.competitorPhase==='profiles'?'閱讀上一版 →':'閱讀目前報告 →';$('#competitorCallout').innerHTML=`<span class="emoji" aria-hidden="true">🔎</span><div><strong>${state.competitorPhase==='profiles'?'個別競品分析頁骨架已建立':state.competitorPhase==='ready'?'綜合報告頁骨架已建立':'先確認要調查的競品'}</strong><p>${state.competitorPhase==='profiles'?'接下來建立綜合報告頁；公開資料仍待 AI 流程蒐集。':state.competitorPhase==='ready'?'上一版報告可繼續閱讀；更新不會刪除它。':'至少輸入一家競品，避免系統猜測你想調查誰。'}</p></div>`};
+    function missingFor(def){return def.needs.filter(need=>need==='websiteFile'?!state.files.some(file=>file.type==='網站資料'):!latest(need))}
+    function needLabel(need){return({customer:'客戶報告頁',competitor:'競品報告頁',internal:'營運報告頁',websiteFile:'網站資料'})[need]}
+    function renderApplications(){const list=$('#applicationList');list.innerHTML=appDefs.map(def=>{const missing=missingFor(def);return`<article class="application"><h3>${def.title}</h3><p>${def.description}</p><div>${def.needs.map(need=>`<span class="pill">${needLabel(need)} ${missing.includes(need)?'待補':'已選'}</span>`).join('')}</div><div class="actions"><button class="button ${missing.length?'':'primary'}" data-app="${def.id}">${missing.length?'查看需要哪些資料':'建立應用報告頁骨架'} →</button><button class="button minor" data-sample="${def.id}">看範例報告 →</button></div></article>`}).join('');$('#applicationRows').innerHTML=state.reports.applications.length?state.reports.applications.map(report=>`<tr><td><button class="button minor" data-open-outline="${report.id}">${escapeHtml(report.title)} · ${report.created}</button></td><td>${report.sources.map(escapeHtml).join('、')}</td><td><span class="status pending">待 AI 分析</span></td></tr>`).join(''):'<tr><td class="empty" colspan="3">尚無應用報告；可先閱讀範例。</td></tr>'}
+    function render(){renderFiles();renderCore('customer');renderCore('internal');renderCompetitors();renderApplications()}
+    $('#applicationList').addEventListener('click',event=>{const button=event.target.closest('[data-app]');if(!button)return;const def=appDefs.find(item=>item.id===button.dataset.app);const missing=missingFor(def);if(missing.length){showToast('請先準備：'+missing.map(needLabel).join('、'));return}const report={id:String(Date.now()+Math.random()),kind:def.id,title:def.title,sources:def.needs.map(needLabel),created:new Date().toLocaleDateString('zh-TW'),status:'待 AI 分析'};state.reports.applications.push(report);render();openReport(def.id,'outline',report)});
+    document.addEventListener('click',event=>{const sampleButton=event.target.closest('[data-sample]');if(sampleButton){openReport(sampleButton.dataset.sample,'sample');return}const outlineButton=event.target.closest('[data-open-outline]');if(!outlineButton)return;const report=[...state.reports.customer,...state.reports.internal,...state.reports.competitor,...state.reports.applications].find(item=>item.id===outlineButton.dataset.openOutline);if(report)openReport(report.kind,'outline',report)});
+    function openReport(kind,mode,report){state.reportOrigin=state.activeTab==='report'?state.reportOrigin:state.activeTab;state.reportView={kind,mode,report};const isSample=mode==='sample';const def=appDefs.find(item=>item.id===kind);$('#reportKicker').textContent=isSample?'範例報告 · 非你的公司資料':'報告頁骨架 · 待 AI 分析';$('#reportTitle').textContent=isSample?(def?def.title:labels[kind]):report.title;$('#reportBack').textContent='← 返回'+({customer:'客戶報告',competitor:'競品報告',internal:'營運報告',applications:'應用報告'})[state.reportOrigin];$('#reportMeta').innerHTML=isSample?'<span>資料：虛構／模擬範例</span><span>用途：展示報告閱讀方式</span>':`<span>建立日期：${report.created}</span><span>狀態：待 AI 分析</span><span>已選來源：${report.sources.length} 項</span>`;let html;if(isSample){const item=sample[kind];if(item){html=`<div class="callout yellow"><span class="emoji">ℹ️</span><div><strong>${item.company}</strong><p>以下是固定的示範內容，不會因你上傳的資料而改變。</p></div></div><h3>先看這個結論</h3><p>${item.summary}</p>${kind==='competitor'?'<h3>三家競品比較</h3><div class="table-wrap comparison"><table class="db"><thead><tr><th>競品</th><th>公開內容重點</th><th>價格資訊</th></tr></thead><tbody><tr><td>Lazy</td><td>男士髮型作品</td><td>未確認</td></tr><tr><td>Max</td><td>美式燙髮、商業造型</td><td>未確認</td></tr><tr><td>Norman</td><td>髮片與剪燙染分開介紹</td><td>未確認</td></tr></tbody></table></div>':''}<h3>三個發現</h3><ol>${item.findings.map(text=>`<li>${text}</li>`).join('')}</ol><h3>範例來源</h3><ul class="source-list">${item.sources.map(text=>`<li>${text}</li>`).join('')}</ul><div class="callout yellow"><span class="emoji">⚠️</span><div><strong>閱讀邊界</strong><p>這些內容只用來展示版型，不代表真實調查或你的公司現況。</p></div></div>`}else{html=`<div class="callout yellow"><span class="emoji">ℹ️</span><div><strong>範例：${def.title}</strong><p>這是一份示意報告，不引用你上傳的資料。</p></div></div><h3>先看這個結論</h3><p>範例公司可以先處理客戶最常問、卻尚未在網站清楚回答的資訊，再安排內容主題和服務說明。</p><h3>引用的基礎報告</h3><ul class="source-list">${def.needs.map(need=>`<li>${needLabel(need)}（範例）</li>`).join('')}</ul><div class="callout yellow"><span class="emoji">⚠️</span><div><strong>閱讀邊界</strong><p>示意結論不適用於你的公司，正式版須連到實際報告與來源。</p></div></div>`}}else{html=`<div class="callout yellow"><span class="emoji">⏳</span><div><strong>這是報告頁骨架，尚未產出分析。</strong><p>Demo 只記錄你選取的檔名或報告名稱；沒有讀取內容、搜尋網頁或生成結論。</p></div></div><h3>本次選取的來源</h3><ul class="source-list">${report.sources.map(source=>`<li>${escapeHtml(source)}</li>`).join('')}</ul><h3>待完成的分析</h3><p class="small">接上 Notion 按鈕與 AI 流程後，這裡會顯示摘要、發現、證據、資料不足之處及版本日期。</p><div class="actions"><button class="button" data-sample="${kind}">先看範例報告 →</button></div>`}$('#reportContent').innerHTML=html;selectTab('report')}
+    $('#reportBack').addEventListener('click',()=>selectTab(state.reportOrigin,true));
+    render();
+  </script>
+</body>
+</html>
